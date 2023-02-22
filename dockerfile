@@ -11,18 +11,20 @@ RUN apt-get update && apt-get install -y \
     libtinfo-dev \
     libncurses5-dev \
     lib32z1 \
-    libssl1.0.0 \
     libssl-dev \
-    libssl1.0.0:i386 \
-    libssl-dev:i386
+    libssl1.1 \
+    libssl1.0-dev \
+    libssl1.1:i386 \
+    libssl1.0-dev:i386 \
+    nodejs \
+    npm && \
+    rm -rf /var/lib/apt/lists/*
 
-# Download and install Valheim Manager
-RUN wget https://github.com/mbround18/valheim-docker/raw/main/valheim-manager.zip && \
-    unzip valheim-manager.zip -d /opt && \
-    chmod +x /opt/valheim-manager/valheim.sh
+# Install Valheim Manager using npm
+RUN npm install -g valheim-manager
 
 # Expose port for Valheim Manager web interface
 EXPOSE 8080
 
 # Start Valheim Manager when container starts
-CMD ["/opt/valheim-manager/valheim.sh"]
+CMD ["valheim-manager"]
