@@ -36,23 +36,17 @@ ENV LOG_FILE_PATH="./logs"
 ENV LOG_FILE_SIZE="100M"
 ENV LOG_FILE_AGE=7
 ENV LOG_FILE_COUNT=4
-RUN if [ -f "/tmp/keyfile.json" ]; then \
-    echo "keyfile.json file exists, setting DISCORD_TOKEN."; \
+RUN if [ -f "/keyfile.txt" ]; then \
+    echo "keyfile.txt file exists, setting DISCORD_TOKEN."; \
     export DISCORD_TOKEN=$(cat /tmp/keyfile.json | jq -r '.DISCORD_TOKEN'); \
     else \
-    echo; \
+    echo "keyfile.txt file DOES NOT exists, setting DISCORD_TOKEN to nothing."; \
     export DISCORD_TOKEN=""; \
     fi
 ENV DISCORD_TOKEN=$DISCORD_TOKEN
 
-# Check if the vmconfig.json file already exists
-# If it does, copy it into the container instead of generating a new one
-RUN if [ -f "/vmconfig.json" ]; then \
-        echo "vmconfig.json file already exists. Copying it into the container."; \
-        cp /vmconfig.json /vmconfig.json.bak; \
-    else \
-        echo "vmconfig.json file does not exist. Generating a new one."; \
-        echo '{ \
+#generate vmconfig.json
+RUN echo '{ \
             "manager": { \
               "configLocation": "'"$CONFIG_LOCATION"'", \
               "serverLocation": "'"$SERVER_LOCATION"'", \
@@ -88,11 +82,11 @@ RUN if [ -f "/vmconfig.json" ]; then \
               "fileAge": '"$LOG_FILE_AGE"', \
               "fileCount": '"$LOG_FILE_COUNT"' \
             } \
-        }' > /vmconfig.json; \
-        npm install -g valheim-manager; \
-    fi
+        }' > /vmconfig.json;
 
 
+# Install Valheim Manager
+npm install -g valheim-manager;
 
 # Expose port for Valheim Manager web interface
 EXPOSE 8080
